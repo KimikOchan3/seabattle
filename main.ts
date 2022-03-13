@@ -114,7 +114,7 @@ function randomfield (fieldnum: number) {
     }
 }
 input.onButtonPressed(Button.A, function () {
-    if (f_menu == 1) {
+    if (f_menu >= 1) {
         if (f_menu_page <= 1) {
             f_menu_page = 5
         } else if (f_menu_page == 2) {
@@ -128,6 +128,13 @@ input.onButtonPressed(Button.A, function () {
         }
     }
 })
+function Shot (X: number, Y: number) {
+    for (let index = 0; index < 4; index++) {
+        led.toggle(X, Y)
+        basic.pause(500)
+    }
+    led.unplot(X, Y)
+}
 input.onButtonPressed(Button.AB, function () {
     if (f_gamestart == 0) {
         random = randint(0, 3)
@@ -135,12 +142,22 @@ input.onButtonPressed(Button.AB, function () {
         ships[random].showImage(0)
         f_gamestart = 1
     } else {
-        f_menu += 1
-        f_menu_page = 1
+        if (f_menu == 1) {
+            attY = f_menu_page
+            f_menu = 2
+            f_menu_page = 1
+        } else if (f_menu == 2) {
+            attX = f_menu_page
+            f_menu = 0
+            Shot(attX - 1, attY - 1)
+        } else {
+            f_menu = 1
+            f_menu_page = 1
+        }
     }
 })
 input.onButtonPressed(Button.B, function () {
-    if (f_menu == 1) {
+    if (f_menu >= 1) {
         if (f_menu_page <= 1) {
             f_menu_page += 1
         } else if (f_menu_page == 2) {
@@ -154,6 +171,8 @@ input.onButtonPressed(Button.B, function () {
         }
     }
 })
+let attX = 0
+let attY = 0
 let random = 0
 let f_gamestart = 0
 let f_menu_page = 0
@@ -230,5 +249,19 @@ basic.forever(function () {
         } else if (f_menu_page == 5) {
             basic.showString("E")
         }
+    } else if (f_menu == 2) {
+        if (f_menu_page == 1) {
+            basic.showString("1")
+        } else if (f_menu_page == 2) {
+            basic.showString("2")
+        } else if (f_menu_page == 3) {
+            basic.showString("3")
+        } else if (f_menu_page == 4) {
+            basic.showString("4")
+        } else if (f_menu_page == 5) {
+            basic.showString("5")
+        }
+    } else {
+        ships[random].showImage(0)
     }
 })
