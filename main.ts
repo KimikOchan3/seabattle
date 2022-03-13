@@ -133,13 +133,19 @@ function Shot (X: number, Y: number) {
         led.toggle(X, Y)
         basic.pause(500)
     }
-    led.unplot(X, Y)
+    if (field[X + Y * 5] == 1) {
+        let list: number[] = []
+        list[X + Y * 5] = 2
+    } else if (field[X + Y * 5] == 0) {
+    	
+    }
+    mapDraw()
 }
 input.onButtonPressed(Button.AB, function () {
     if (f_gamestart == 0) {
         random = randint(0, 3)
         randomfield(random)
-        ships[random].showImage(0)
+        mapDraw()
         f_gamestart = 1
     } else {
         if (f_menu == 1) {
@@ -171,6 +177,25 @@ input.onButtonPressed(Button.B, function () {
         }
     }
 })
+function mapDraw () {
+    attX = 0
+    attY = 0
+    for (let index = 0; index < 5; index++) {
+        for (let index = 0; index < 5; index++) {
+            if (field[attX + attY * 5] == 1) {
+                led.plot(attX, attY)
+            } else if (field[attX + attY * 5] == 0) {
+                led.unplot(attX, attY)
+            } else if (field[attX + attY * 5] == 2) {
+                led.plotBrightness(attX, attY, 88)
+            }
+            attY += 1
+        }
+        attY = 0
+        attX += 1
+    }
+    attX = 0
+}
 let attX = 0
 let attY = 0
 let random = 0
@@ -178,8 +203,9 @@ let f_gamestart = 0
 let f_menu_page = 0
 let f_menu = 0
 let field: number[] = []
-let ships: Image[] = []
-ships = [
+basic.clearScreen()
+led.setDisplayMode(DisplayMode.Greyscale)
+let ships = [
 images.createImage(`
     # # # . #
     . . . . .
@@ -237,31 +263,33 @@ field = [
 0
 ]
 basic.forever(function () {
-    if (f_menu == 1) {
-        if (f_menu_page == 1) {
-            basic.showString("A")
-        } else if (f_menu_page == 2) {
-            basic.showString("B")
-        } else if (f_menu_page == 3) {
-            basic.showString("C")
-        } else if (f_menu_page == 4) {
-            basic.showString("D")
-        } else if (f_menu_page == 5) {
-            basic.showString("E")
+    if (f_gamestart == 1) {
+        if (f_menu == 1) {
+            if (f_menu_page == 1) {
+                basic.showString("A")
+            } else if (f_menu_page == 2) {
+                basic.showString("B")
+            } else if (f_menu_page == 3) {
+                basic.showString("C")
+            } else if (f_menu_page == 4) {
+                basic.showString("D")
+            } else if (f_menu_page == 5) {
+                basic.showString("E")
+            }
+        } else if (f_menu == 2) {
+            if (f_menu_page == 1) {
+                basic.showString("1")
+            } else if (f_menu_page == 2) {
+                basic.showString("2")
+            } else if (f_menu_page == 3) {
+                basic.showString("3")
+            } else if (f_menu_page == 4) {
+                basic.showString("4")
+            } else if (f_menu_page == 5) {
+                basic.showString("5")
+            }
+        } else {
+            mapDraw()
         }
-    } else if (f_menu == 2) {
-        if (f_menu_page == 1) {
-            basic.showString("1")
-        } else if (f_menu_page == 2) {
-            basic.showString("2")
-        } else if (f_menu_page == 3) {
-            basic.showString("3")
-        } else if (f_menu_page == 4) {
-            basic.showString("4")
-        } else if (f_menu_page == 5) {
-            basic.showString("5")
-        }
-    } else {
-        ships[random].showImage(0)
     }
 })
