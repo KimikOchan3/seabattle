@@ -135,8 +135,7 @@ function Shot (X: number, Y: number) {
         basic.pause(200)
     }
     if (field[X + Y * 5] == 1) {
-        let list: number[] = []
-        list[X + Y * 5] = 2
+        field[X + Y * 5] = 2
     } else if (field[X + Y * 5] == 0) {
     	
     }
@@ -148,6 +147,8 @@ input.onButtonPressed(Button.AB, function () {
         randomfield(random)
         mapDraw()
         f_gamestart = 1
+        radio.sendString("sea.battlestart")
+        mp_IsMyTurn = 1
     } else {
         if (f_menu == 1) {
             attY = f_menu_page
@@ -158,11 +159,22 @@ input.onButtonPressed(Button.AB, function () {
             f_menu = 0
             Shot(attX - 1, attY - 1)
             mapDraw()
+            radio.sendValue("sea.xshot", attX)
+            radio.sendValue("sea.yshot", attY)
+            radio.sendString("sea.shot")
         } else {
-            f_menu = 1
-            f_menu_page = 1
+            if (mp_IsMyTurn == 1) {
+                f_menu = 1
+                f_menu_page = 1
+            }
         }
     }
+})
+radio.onReceivedString(function (receivedString) {
+    random = randint(0, 3)
+    randomfield(random)
+    mapDraw()
+    f_gamestart = 1
 })
 input.onButtonPressed(Button.B, function () {
     if (f_menu >= 1) {
@@ -200,11 +212,14 @@ function mapDraw () {
 }
 let attX = 0
 let attY = 0
+let mp_IsMyTurn = 0
 let random = 0
 let f_gamestart = 0
 let f_menu_page = 0
 let f_menu = 0
 let field: number[] = []
+radio.setGroup(333)
+radio.sendString("ping!")
 basic.clearScreen()
 led.setDisplayMode(DisplayMode.Greyscale)
 let ships = [
