@@ -129,9 +129,10 @@ input.onButtonPressed(Button.A, function () {
     }
 })
 function Shot (X: number, Y: number) {
-    for (let index = 0; index < 4; index++) {
+    mapDraw()
+    for (let index = 0; index < 6; index++) {
         led.toggle(X, Y)
-        basic.pause(500)
+        basic.pause(200)
     }
     if (field[X + Y * 5] == 1) {
         let list: number[] = []
@@ -156,6 +157,7 @@ input.onButtonPressed(Button.AB, function () {
             attX = f_menu_page
             f_menu = 0
             Shot(attX - 1, attY - 1)
+            mapDraw()
         } else {
             f_menu = 1
             f_menu_page = 1
@@ -289,7 +291,7 @@ basic.forever(function () {
                 basic.showString("5")
             }
         } else {
-            mapDraw()
+        	
         }
     }
 })
