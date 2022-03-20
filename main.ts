@@ -149,32 +149,32 @@ input.onButtonPressed(Button.AB, function () {
         f_gamestart = 1
         radio.sendString("sea.battlestart")
         mp_IsMyTurn = 1
-    } else {
-        if (f_menu == 1) {
-            attY = f_menu_page
-            f_menu = 2
-            f_menu_page = 1
-        } else if (f_menu == 2) {
-            attX = f_menu_page
-            f_menu = 0
-            Shot(attX - 1, attY - 1)
-            mapDraw()
-            radio.sendValue("sea.xshot", attX)
-            radio.sendValue("sea.yshot", attY)
-            radio.sendString("sea.shot")
-        } else {
-            if (mp_IsMyTurn == 1) {
-                f_menu = 1
-                f_menu_page = 1
-            }
-        }
+    } else if (f_menu == 1) {
+        attY = f_menu_page
+        f_menu = 2
+        f_menu_page = 1
+    } else if (f_menu == 2) {
+        attX = f_menu_page
+        f_menu = 0
+        radio.sendValue("sea.xshot", attX)
+        radio.sendValue("sea.yshot", attY)
+        radio.sendString("sea.shot")
+        mapDraw()
+    } else if (mp_IsMyTurn == 1) {
+        f_menu = 1
+        f_menu_page = 1
     }
 })
 radio.onReceivedString(function (receivedString) {
-    random = randint(0, 3)
-    randomfield(random)
-    mapDraw()
-    f_gamestart = 1
+    if (receivedString == "sea.battlestart") {
+        random = randint(0, 3)
+        randomfield(random)
+        mapDraw()
+        f_gamestart = 1
+    } else if (receivedString == "sea.shot") {
+        mapDraw()
+        Shot(mp_bigshotX - 1, mp_bigshotY - 1)
+    }
 })
 input.onButtonPressed(Button.B, function () {
     if (f_menu >= 1) {
@@ -210,10 +210,19 @@ function mapDraw () {
     }
     attX = 0
 }
+radio.onReceivedValue(function (name, value) {
+    if (name == "sea.xshot") {
+        mp_bigshotX = value
+    } else if (name == "sea.yshot") {
+        mp_bigshotY = value
+    }
+})
+let mp_bigshotY = 0
+let mp_bigshotX = 0
 let attX = 0
 let attY = 0
-let mp_IsMyTurn = 0
 let random = 0
+let mp_IsMyTurn = 0
 let f_gamestart = 0
 let f_menu_page = 0
 let f_menu = 0
