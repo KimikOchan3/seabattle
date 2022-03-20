@@ -137,7 +137,8 @@ function Shot (X: number, Y: number) {
     if (field[X + Y * 5] == 1) {
         field[X + Y * 5] = 2
     } else if (field[X + Y * 5] == 0) {
-    	
+        mp_IsMyTurn = 1
+        radio.sendString("mimo")
     }
     mapDraw()
 }
@@ -174,6 +175,8 @@ radio.onReceivedString(function (receivedString) {
     } else if (receivedString == "shot") {
         mapDraw()
         Shot(mp_bigshotX - 1, mp_bigshotY - 1)
+    } else if (receivedString == "mimo") {
+        mp_IsMyTurn = 0
     }
 })
 input.onButtonPressed(Button.B, function () {
@@ -222,11 +225,12 @@ let mp_bigshotX = 0
 let attX = 0
 let attY = 0
 let random = 0
-let mp_IsMyTurn = 0
 let f_gamestart = 0
+let mp_IsMyTurn = 0
 let f_menu_page = 0
 let f_menu = 0
 let field: number[] = []
+radio.setTransmitPower(7)
 radio.setGroup(333)
 radio.sendString("ping!")
 basic.clearScreen()
