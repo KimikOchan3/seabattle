@@ -147,7 +147,7 @@ input.onButtonPressed(Button.AB, function () {
         randomfield(random)
         mapDraw()
         f_gamestart = 1
-        radio.sendString("sea.battlestart")
+        radio.sendString("battlestart")
         mp_IsMyTurn = 1
     } else if (f_menu == 1) {
         attY = f_menu_page
@@ -156,9 +156,9 @@ input.onButtonPressed(Button.AB, function () {
     } else if (f_menu == 2) {
         attX = f_menu_page
         f_menu = 0
-        radio.sendValue("sea.xshot", attX)
-        radio.sendValue("sea.yshot", attY)
-        radio.sendString("sea.shot")
+        radio.sendValue("xshot", attX)
+        radio.sendValue("yshot", attY)
+        radio.sendString("shot")
         mapDraw()
     } else if (mp_IsMyTurn == 1) {
         f_menu = 1
@@ -166,12 +166,12 @@ input.onButtonPressed(Button.AB, function () {
     }
 })
 radio.onReceivedString(function (receivedString) {
-    if (receivedString == "sea.battlestart") {
+    if (receivedString == "battlestart") {
         random = randint(0, 3)
         randomfield(random)
         mapDraw()
         f_gamestart = 1
-    } else if (receivedString == "sea.shot") {
+    } else if (receivedString == "shot") {
         mapDraw()
         Shot(mp_bigshotX - 1, mp_bigshotY - 1)
     }
@@ -211,9 +211,9 @@ function mapDraw () {
     attX = 0
 }
 radio.onReceivedValue(function (name, value) {
-    if (name == "sea.xshot") {
+    if (name == "xshot") {
         mp_bigshotX = value
-    } else if (name == "sea.yshot") {
+    } else if (name == "yshot") {
         mp_bigshotY = value
     }
 })
