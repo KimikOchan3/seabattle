@@ -1,3 +1,7 @@
+function display_score () {
+    basic.showNumber(score)
+    basic.pause(2000)
+}
 function randomfield (fieldnum: number) {
     if (fieldnum == 0) {
         field = [
@@ -126,6 +130,8 @@ input.onButtonPressed(Button.A, function () {
         } else if (f_menu_page >= 5) {
             f_menu_page += -1
         }
+    } else if (f_menu_page > -1) {
+        f_menu_page += -1
     }
 })
 function Shot (X: number, Y: number) {
@@ -136,9 +142,10 @@ function Shot (X: number, Y: number) {
     }
     if (field[X + Y * 5] == 1) {
         field[X + Y * 5] = 2
+        radio.sendString("hit")
     } else if (field[X + Y * 5] == 0) {
         mp_IsMyTurn = 1
-        radio.sendString("mimo")
+        radio.sendString("miss")
     }
     mapDraw()
 }
@@ -148,8 +155,8 @@ input.onButtonPressed(Button.AB, function () {
         randomfield(random)
         mapDraw()
         f_gamestart = 1
-        radio.sendString("battlestart")
         mp_IsMyTurn = 1
+        radio.sendString("battlestart")
     } else if (f_menu == 1) {
         attY = f_menu_page
         f_menu = 2
@@ -175,8 +182,11 @@ radio.onReceivedString(function (receivedString) {
     } else if (receivedString == "shot") {
         mapDraw()
         Shot(mp_bigshotX - 1, mp_bigshotY - 1)
-    } else if (receivedString == "mimo") {
+    } else if (receivedString == "miss") {
         mp_IsMyTurn = 0
+    } else if (receivedString == "hit") {
+        debris[mp_bigshotX + mp_bigshotY * 5] = 1
+        score += 1
     }
 })
 input.onButtonPressed(Button.B, function () {
@@ -192,6 +202,8 @@ input.onButtonPressed(Button.B, function () {
         } else if (f_menu_page >= 5) {
             f_menu_page = 1
         }
+    } else if (f_menu_page < 1) {
+        f_menu_page += 1
     }
 })
 function mapDraw () {
@@ -220,6 +232,23 @@ radio.onReceivedValue(function (name, value) {
         mp_bigshotY = value
     }
 })
+function display_debris () {
+    attX = 0
+    attY = 0
+    for (let index = 0; index < 5; index++) {
+        for (let index = 0; index < 5; index++) {
+            if (debris[attX + attY * 5] == 1) {
+                led.plotBrightness(attX, attY, 88)
+            } else if (debris[attX + attY * 5] == 0) {
+                led.unplot(attX, attY)
+            }
+            attY += 1
+        }
+        attY = 0
+        attX += 1
+    }
+    attX = 0
+}
 let mp_bigshotY = 0
 let mp_bigshotX = 0
 let attX = 0
@@ -229,6 +258,8 @@ let f_gamestart = 0
 let mp_IsMyTurn = 0
 let f_menu_page = 0
 let f_menu = 0
+let score = 0
+let debris: number[] = []
 let field: number[] = []
 radio.setTransmitPower(7)
 radio.setGroup(333)
@@ -292,9 +323,44 @@ field = [
 0,
 0
 ]
+debris = [
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+0
+]
 basic.forever(function () {
     if (f_gamestart == 1) {
-        if (f_menu == 1) {
+        if (f_menu == 0) {
+            if (f_menu_page == -1) {
+                display_score()
+            } else if (f_menu_page == 0) {
+                mapDraw()
+            } else if (f_menu_page == 1) {
+                display_debris()
+            }
+        } else if (f_menu == 1) {
             if (f_menu_page == 1) {
                 basic.showString("A")
             } else if (f_menu_page == 2) {
@@ -318,8 +384,6 @@ basic.forever(function () {
             } else if (f_menu_page == 5) {
                 basic.showString("5")
             }
-        } else {
-        	
         }
     }
 })
