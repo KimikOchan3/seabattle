@@ -163,6 +163,7 @@ input.onButtonPressed(Button.AB, function () {
         f_menu_page = 1
     } else if (f_menu == 2) {
         attX = f_menu_page
+        f_menu_page = 0
         f_menu = 0
         radio.sendValue("xshot", attX)
         radio.sendValue("yshot", attY)
@@ -185,7 +186,7 @@ radio.onReceivedString(function (receivedString) {
     } else if (receivedString == "miss") {
         mp_IsMyTurn = 0
     } else if (receivedString == "hit") {
-        debris[mp_bigshotX + mp_bigshotY * 5] = 1
+        debris[attX + attY * 5] = 1
         score += 1
     }
 })
