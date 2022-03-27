@@ -1,6 +1,9 @@
 function display_score () {
+    basic.clearScreen()
     basic.showNumber(score)
-    basic.pause(2000)
+    basic.pause(100)
+    f_menu_page = 0
+    Render()
 }
 function randomfield (fieldnum: number) {
     if (fieldnum == 0) {
@@ -133,7 +136,45 @@ input.onButtonPressed(Button.A, function () {
     } else if (f_menu_page > -1) {
         f_menu_page += -1
     }
+    Render()
 })
+function Render () {
+    if (f_gamestart == 1) {
+        if (f_menu == 0) {
+            if (f_menu_page == -1) {
+                display_score()
+            } else if (f_menu_page == 0) {
+                mapDraw()
+            } else if (f_menu_page == 1) {
+                display_debris()
+            }
+        } else if (f_menu == 1) {
+            if (f_menu_page == 1) {
+                basic.showString("A")
+            } else if (f_menu_page == 2) {
+                basic.showString("B")
+            } else if (f_menu_page == 3) {
+                basic.showString("C")
+            } else if (f_menu_page == 4) {
+                basic.showString("D")
+            } else if (f_menu_page == 5) {
+                basic.showString("E")
+            }
+        } else if (f_menu == 2) {
+            if (f_menu_page == 1) {
+                basic.showString("1")
+            } else if (f_menu_page == 2) {
+                basic.showString("2")
+            } else if (f_menu_page == 3) {
+                basic.showString("3")
+            } else if (f_menu_page == 4) {
+                basic.showString("4")
+            } else if (f_menu_page == 5) {
+                basic.showString("5")
+            }
+        }
+    }
+}
 function Shot (X: number, Y: number) {
     mapDraw()
     for (let index = 0; index < 6; index++) {
@@ -173,6 +214,7 @@ input.onButtonPressed(Button.AB, function () {
         f_menu = 1
         f_menu_page = 1
     }
+    Render()
 })
 radio.onReceivedString(function (receivedString) {
     if (receivedString == "battlestart") {
@@ -186,7 +228,7 @@ radio.onReceivedString(function (receivedString) {
     } else if (receivedString == "miss") {
         mp_IsMyTurn = 0
     } else if (receivedString == "hit") {
-        debris[attX + attY * 5] = 1
+        debris[attX - 1 + (attY - 1) * 5] = 1
         score += 1
     }
 })
@@ -206,25 +248,25 @@ input.onButtonPressed(Button.B, function () {
     } else if (f_menu_page < 1) {
         f_menu_page += 1
     }
+    Render()
 })
 function mapDraw () {
-    attX = 0
-    attY = 0
+    XDraw = 0
+    YDraw = 0
+    basic.clearScreen()
     for (let index = 0; index < 5; index++) {
         for (let index = 0; index < 5; index++) {
-            if (field[attX + attY * 5] == 1) {
-                led.plot(attX, attY)
-            } else if (field[attX + attY * 5] == 0) {
-                led.unplot(attX, attY)
-            } else if (field[attX + attY * 5] == 2) {
-                led.plotBrightness(attX, attY, 88)
+            if (field[XDraw + YDraw * 5] == 1) {
+                led.plot(XDraw, YDraw)
+            } else if (field[XDraw + YDraw * 5] == 2) {
+                led.plotBrightness(XDraw, YDraw, 88)
             }
-            attY += 1
+            YDraw += 1
         }
-        attY = 0
-        attX += 1
+        YDraw = 0
+        XDraw += 1
     }
-    attX = 0
+    XDraw = 0
 }
 radio.onReceivedValue(function (name, value) {
     if (name == "xshot") {
@@ -234,37 +276,39 @@ radio.onReceivedValue(function (name, value) {
     }
 })
 function display_debris () {
-    attX = 0
-    attY = 0
+    XDraw = 0
+    YDraw = 0
+    basic.clearScreen()
     for (let index = 0; index < 5; index++) {
         for (let index = 0; index < 5; index++) {
-            if (debris[attX + attY * 5] == 1) {
-                led.plotBrightness(attX, attY, 88)
-            } else if (debris[attX + attY * 5] == 0) {
-                led.unplot(attX, attY)
+            if (debris[XDraw + YDraw * 5] == 1) {
+                led.plotBrightness(XDraw, YDraw, 88)
             }
-            attY += 1
+            YDraw += 1
         }
-        attY = 0
-        attX += 1
+        YDraw = 0
+        XDraw += 1
     }
     attX = 0
 }
+let YDraw = 0
+let XDraw = 0
+let debris: number[] = []
 let mp_bigshotY = 0
 let mp_bigshotX = 0
 let attX = 0
 let attY = 0
 let random = 0
-let f_gamestart = 0
 let mp_IsMyTurn = 0
-let f_menu_page = 0
+let f_gamestart = 0
 let f_menu = 0
-let score = 0
-let debris: number[] = []
 let field: number[] = []
+let f_menu_page = 0
+let score = 0
 radio.setTransmitPower(7)
 radio.setGroup(333)
 radio.sendString("ping!")
+score = 10
 basic.clearScreen()
 led.setDisplayMode(DisplayMode.Greyscale)
 let ships = [
@@ -297,94 +341,6 @@ images.createImage(`
     # # # . #
     `)
 ]
-field = [
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0
-]
-debris = [
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0,
-0
-]
 basic.forever(function () {
-    if (f_gamestart == 1) {
-        if (f_menu == 0) {
-            if (f_menu_page == -1) {
-                display_score()
-            } else if (f_menu_page == 0) {
-                mapDraw()
-            } else if (f_menu_page == 1) {
-                display_debris()
-            }
-        } else if (f_menu == 1) {
-            if (f_menu_page == 1) {
-                basic.showString("A")
-            } else if (f_menu_page == 2) {
-                basic.showString("B")
-            } else if (f_menu_page == 3) {
-                basic.showString("C")
-            } else if (f_menu_page == 4) {
-                basic.showString("D")
-            } else if (f_menu_page == 5) {
-                basic.showString("E")
-            }
-        } else if (f_menu == 2) {
-            if (f_menu_page == 1) {
-                basic.showString("1")
-            } else if (f_menu_page == 2) {
-                basic.showString("2")
-            } else if (f_menu_page == 3) {
-                basic.showString("3")
-            } else if (f_menu_page == 4) {
-                basic.showString("4")
-            } else if (f_menu_page == 5) {
-                basic.showString("5")
-            }
-        }
-    }
+	
 })
